@@ -1,0 +1,155 @@
+-- CREATE DATABASE
+CREATE DATABASE hostel_management1;
+
+-- USE DATABASE
+USE hostel_management;
+
+-- =====================================
+-- STUDENTS TABLE
+-- =====================================
+
+CREATE TABLE students (
+    student_id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    gender ENUM('Male','Female','Other'),
+    dob DATE,
+    email VARCHAR(100) UNIQUE,
+    phone VARCHAR(15),
+    address TEXT,
+    college_name VARCHAR(100),
+    course VARCHAR(100),
+    join_date DATE,
+    password VARCHAR(255) NOT NULL
+);
+
+-- =====================================
+-- HOSTELS TABLE
+-- =====================================
+
+CREATE TABLE hostels (
+    hostel_id INT AUTO_INCREMENT PRIMARY KEY,
+    hostel_name VARCHAR(100) NOT NULL,
+    hostel_type ENUM('Boys','Girls') NOT NULL,
+    total_rooms INT NOT NULL,
+    address TEXT
+);
+
+-- =====================================
+-- ROOMS TABLE
+-- =====================================
+
+CREATE TABLE rooms (
+    room_id INT AUTO_INCREMENT PRIMARY KEY,
+    hostel_id INT NOT NULL,
+    room_number VARCHAR(20) NOT NULL,
+    room_type ENUM('Single','Double','Triple'),
+    capacity INT NOT NULL,
+    occupied INT DEFAULT 0,
+    fees DECIMAL(10,2),
+
+    FOREIGN KEY (hostel_id)
+    REFERENCES hostels(hostel_id)
+    ON DELETE CASCADE
+);
+
+-- =====================================
+-- ALLOCATIONS TABLE
+-- =====================================
+
+CREATE TABLE allocations (
+    allocation_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    room_id INT NOT NULL,
+    bed_number VARCHAR(10),
+    check_in DATE,
+    check_out DATE,
+    status ENUM('Active','Vacated') DEFAULT 'Active',
+
+    FOREIGN KEY (student_id)
+    REFERENCES students(student_id)
+    ON DELETE CASCADE,
+
+    FOREIGN KEY (room_id)
+    REFERENCES rooms(room_id)
+    ON DELETE CASCADE
+);
+
+-- =====================================
+-- PAYMENTS TABLE
+-- =====================================
+
+CREATE TABLE payments (
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    amount DECIMAL(10,2),
+    payment_date DATE,
+    payment_method ENUM('Cash','UPI','Card'),
+    payment_status ENUM('Paid','Pending') DEFAULT 'Pending',
+
+    FOREIGN KEY (student_id)
+    REFERENCES students(student_id)
+    ON DELETE CASCADE
+);
+
+-- =====================================
+-- COMPLAINTS TABLE
+-- =====================================
+
+CREATE TABLE complaints (
+    complaint_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    complaint_text TEXT,
+    complaint_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('Pending','Resolved') DEFAULT 'Pending',
+
+    FOREIGN KEY (student_id)
+    REFERENCES students(student_id)
+    ON DELETE CASCADE
+);
+
+-- =====================================
+-- INSERT SAMPLE DATA
+-- =====================================
+
+INSERT INTO hostels
+(hostel_name, hostel_type, total_rooms, address)
+VALUES
+('Krishna Hostel','Boys',50,'Hyderabad'),
+('Lakshmi Hostel','Girls',40,'Vijayawada');
+
+INSERT INTO rooms
+(hostel_id, room_number, room_type, capacity, fees)
+VALUES
+(1,'B101','Double',2,5000),
+(2,'G201','Single',1,7000);
+
+INSERT INTO students
+(full_name, gender, dob, email, phone,
+address, college_name, course,
+join_date, password)
+VALUES
+('Sai Gowthami','Female','2003-05-12',
+'gowthami@gmail.com','9876543210',
+'Andhra Pradesh','ABC College',
+'B.Tech','2026-05-01','12345');
+
+INSERT INTO allocations
+(student_id, room_id, bed_number, check_in)
+VALUES
+(1,2,'A1','2026-05-10');
+
+INSERT INTO payments
+(student_id, amount, payment_date,
+payment_method, payment_status)
+VALUES
+(1,7000,'2026-05-10','UPI','Paid');
+
+-- =====================================
+-- VIEW DATA
+-- =====================================
+
+SELECT * FROM students;
+SELECT * FROM hostels;
+SELECT * FROM rooms;
+SELECT * FROM allocations;
+SELECT * FROM payments;
